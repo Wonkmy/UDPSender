@@ -22,7 +22,7 @@ server.on('message',(msg,rinfo)=>{
     }
     if(pose.dataType=="update_ball_pos"){
         allClient.forEach(client => {
-            server.send(JSON.stringify({ballId:pose.ballId,resultCode:"can_update_ballpos",pos:pose.pos,rot:pose.rot,count:allClient.length}),client.port, client.address)
+            server.send(JSON.stringify({ballId:pose.ballId,resultCode:"can_update_ball_pos",pos:pose.pos,rot:pose.rot,count:allClient.length}),client.port, client.address)
         });
     }
 })
