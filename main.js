@@ -1,15 +1,9 @@
 var dgram =require("dgram")
 const server = dgram.createSocket('udp4')
 
-class UserInfo{
-    constructor(userId,userName,userPwd){
-        this.userId=userId;
-        this.userName=userName;
-        this.userPwd=userPwd;
-    }
-}
-
-const allUserList=[]
+var SqliteDB = require('./sqliteApi').SqliteDB;
+var file = "./dbs/userinfo.db";
+var sqliteDB = new SqliteDB(file);
 
 server.on('error',(err)=>{
     console.log(err);
@@ -23,32 +17,31 @@ server.on('listening',()=>{
 server.on('message',(msg,rinfo)=>{
     console.log(rinfo.address+":"+rinfo.port+"="+msg);
     let loginData = JSON.parse(msg);
-    if(loginData.reqId==0)//登陆请求id
+    if(loginData.reqId==1)//请求id,每个请求的数据都会有一个请求id
     {
-        console.log("请求id是0");
-        if(allUserList.length>0){
-            allUserList.forEach(user => {
-                if(loginData.userName==user.userName){//说明列表中有此用户
-                    console.log("有");
-                    if(loginData.userPwd==user.userPwd){//用户名密码正确
-                        //准备发送一个登陆成功的消息
-                        server.send(JSON.stringify({resId:0,resultCode:1}),rinfo.port,rinfo.address)
+        var querySql = 'select * from sharewaf_data';
+        sqliteDB.queryData(querySql, (obj)=>{
+            if(loginData.userId==obj[0].userId){
+                console.log("已经有用户了");
+                if(loginData.userPwd==obj[0].userPwd)//密码正确
+                {
+                    if(loginData.userName==obj[0].userName){
+                        server.send(JSON.stringify({resId:0,resultCode:1,msg:"登录成功"}),rinfo.port,rinfo.address)
+                    }else{
+                        server.send(JSON.stringify({resId:0,resultCode:-1,msg:"用户名错误"}),rinfo.port,rinfo.address)
                     }
                 }else{
-                    console.log("没有");
-                    let userInfo=new UserInfo(loginData.userId,loginData.userName,loginData.userPwd);
-                    allUserList.push(userInfo)
-                    //创建完之后，发送一个登陆成功的消息
-                    server.send(JSON.stringify({resId:0,resultCode:1}),rinfo.port,rinfo.address)
+                    
+                    server.send(JSON.stringify({resId:0,resultCode:-1,msg:"密码错误"}),rinfo.port,rinfo.address)
                 }
-            });
-        }
-        else{
-            let userInfo=new UserInfo(loginData.userId,loginData.userName,loginData.userPwd);
-            allUserList.push(userInfo)
-            //创建完之后，发送一个登陆成功的消息
-            server.send(JSON.stringify({resId:0,resultCode:1}),rinfo.port,rinfo.address)
-        }
+            }else{
+                console.log("新用户");
+                var tileData = [[loginData.userId, loginData.userName, loginData.userPwd]];
+                var insertTileSql = "insert into sharewaf_data(userId, userName, userPwd) VALUES(?,?,?)";
+                sqliteDB.insertData(insertTileSql, tileData);
+                server.send(JSON.stringify({resId:0,resultCode:1}),rinfo.port,rinfo.address)
+            }
+        });
     }
 })
 
