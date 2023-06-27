@@ -17,7 +17,7 @@ server.on('listening',()=>{
 server.on('message',(msg,rinfo)=>{
     console.log(rinfo.address+":"+rinfo.port+"="+msg);
     let loginData = JSON.parse(msg);
-    if(loginData.reqId==1)//请求id,每个请求的数据都会有一个请求id
+    if(loginData.reqId==0)//请求id,每个请求的数据都会有一个请求id
     {
         var querySql = 'select * from sharewaf_data';
         sqliteDB.queryData(querySql, (obj)=>{

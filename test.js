@@ -48,12 +48,12 @@ var sqliteDB = new SqliteDB(file);
 // sqliteDB.insertData(insertTileSql, tileData);
 
 // 查询数据 
-var querySql = 'select * from sharewaf_data';
-sqliteDB.queryData(querySql, dataDeal);
+// var querySql = 'select * from sharewaf_data';
+// sqliteDB.queryData(querySql, dataDeal);
 
-function dataDeal(objects){
-  console.log(objects);
-}
+// function dataDeal(objects){
+//   console.log(objects);
+// }
 
 /// update data.
 // var updateSql = 'update sharewaf_data set level = 2 where level = 1';
