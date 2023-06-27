@@ -15,31 +15,37 @@ server.on('listening',()=>{
 })
 
 server.on('message',(msg,rinfo)=>{
-    console.log(rinfo.address+":"+rinfo.port+"="+msg);
     let loginData = JSON.parse(msg);
     if(loginData.reqId==0)//请求id,每个请求的数据都会有一个请求id
     {
         var querySql = 'select * from sharewaf_data';
         sqliteDB.queryData(querySql, (obj)=>{
-            if(loginData.userId==obj[0].userId){
-                console.log("已经有用户了");
-                if(loginData.userPwd==obj[0].userPwd)//密码正确
-                {
-                    if(loginData.userName==obj[0].userName){
-                        server.send(JSON.stringify({resId:0,resultCode:1,msg:"登录成功"}),rinfo.port,rinfo.address)
+            let a=0;
+            for (let i = 0; i < obj.length; i++) {
+                if(loginData.userId==obj[i].userId){
+                    if(loginData.userName==obj[i].userName){
+                        console.log("已经有用户了,他的地址和端口为：\n"+rinfo.address+":"+rinfo.port);
+                        if(loginData.userPwd==obj[i].userPwd){
+                            
+                            console.log(loginData.userName+":登陆成功\n详细信息为:"+msg);
+                            server.send(JSON.stringify({resId:0,resultCode:1,msg:"登陆成功"}),rinfo.port,rinfo.address)
+                        }else{
+                            server.send(JSON.stringify({resId:0,resultCode:-1,msg:"密码错误"}),rinfo.port,rinfo.address)
+                        }
                     }else{
                         server.send(JSON.stringify({resId:0,resultCode:-1,msg:"用户名错误"}),rinfo.port,rinfo.address)
                     }
+                    return
                 }else{
-                    
-                    server.send(JSON.stringify({resId:0,resultCode:-1,msg:"密码错误"}),rinfo.port,rinfo.address)
+                    a++
                 }
-            }else{
+            }
+            if (a >= obj.length) {
                 console.log("新用户");
                 var tileData = [[loginData.userId, loginData.userName, loginData.userPwd]];
                 var insertTileSql = "insert into sharewaf_data(userId, userName, userPwd) VALUES(?,?,?)";
                 sqliteDB.insertData(insertTileSql, tileData);
-                server.send(JSON.stringify({resId:0,resultCode:1}),rinfo.port,rinfo.address)
+                server.send(JSON.stringify({ resId: 0, resultCode: 1 }), rinfo.port, rinfo.address)
             }
         });
     }
