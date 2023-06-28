@@ -33,22 +33,22 @@
 //     });
 //   }
 // })
-
+console.log();
 var SqliteDB = require('./sqliteApi').SqliteDB;
-var file = "./dbs/userinfo.db";
+var file = "./dbs/platformgame.db";
 var sqliteDB = new SqliteDB(file);
 
 //创建表
-// var createTileTableSql = "create table if not exists sharewaf_data(userId NUMERIC, userName TEXT, userPwd TEXT);";
+// var createTileTableSql = "create table if not exists user_data(userId NUMERIC, userName TEXT, userPwd TEXT);";
 // sqliteDB.createTable(createTileTableSql);
 
 // 插入数据
 // var tileData = [["1", "wonkmy", "123456"]];
-// var insertTileSql = "insert into sharewaf_data(userId, userName, userPwd) VALUES(?,?,?)";
+// var insertTileSql = "insert into user_data(userId, userName, userPwd) VALUES(?,?,?)";
 // sqliteDB.insertData(insertTileSql, tileData);
 
 // 查询数据 
-var querySql = 'select * from sharewaf_data';
+var querySql = 'select * from user_data';
 sqliteDB.queryData(querySql, dataDeal);
 
 function dataDeal(objects){
@@ -56,5 +56,5 @@ function dataDeal(objects){
 }
 
 /// update data.
-// var updateSql = 'update sharewaf_data set level = 2 where level = 1';
+// var updateSql = 'update user_data set level = 2 where level = 1';
 // sqliteDB.executeSql(updateSql);
