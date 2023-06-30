@@ -48,7 +48,7 @@ var sqliteDB = new SqliteDB(file);
 // sqliteDB.insertData(insertTileSql, tileData);
 
 // 查询数据 
-var querySql = 'select * from user_data';
+var querySql = 'select * from Items';
 sqliteDB.queryData(querySql, dataDeal);
 
 function dataDeal(objects){
